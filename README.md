@@ -1,3 +1,7 @@
+# Fork goals
+
+* [x] Make goback messages multilingual (FR and IT are now available).
+
 # Stay Focused Chrome Extension
 
 * [Introduction](#introduction)
