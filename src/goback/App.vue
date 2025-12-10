@@ -1,17 +1,29 @@
 <template>
-  <card-with-logo>
-    <template v-slot:header>
-      <div class="md-title">{{ randomImage.text }}</div>
-    </template>
-    <template v-slot:media>
-      <img id="go-back-image" :src="randomImage.path" />
-    </template>
-  </card-with-logo>
+  <div class="container-fluid d-flex flex-column align-items-center min-vh-100 p-3 pt-5">
+    <button 
+      class="btn position-absolute top-0 end-0 m-3 border-0" 
+      :class="theme === 'dark' ? 'text-white' : 'text-dark'"
+      @click="toggleTheme"
+    >
+      {{ theme === 'dark' ? '☀️' : '🌙' }}
+    </button>
+
+    <div class="text-center w-100 mt-5" style="max-width: 650px;">
+      <div class="mb-4">
+        <img :src="theme === 'dark' ? '../images/logo-red-white.png' : '../images/logo-red.png'" alt="logo" style="width: 200px;" />
+      </div>
+
+      <h3 class="mb-4 fw-normal text-body">
+        {{ randomImage.text }}
+      </h3>
+
+      <img id="go-back-image" :src="randomImage.path" class="img-fluid rounded" alt="Go Back" />
+    </div>
+  </div>
 </template>
 
 <script>
 import { localStorage } from "../chromeApiHelpers";
-import CardWithLogo from "../sharedComponents/CardWithLogo";
 
 const supportedLangs = ['en', 'fr', 'it'];
 let langCode = navigator.language.slice(0, 2);
@@ -19,12 +31,13 @@ const userLang = supportedLangs.includes(langCode) ? langCode : 'en';
 
 export default {
   name: "App",
-  components: { CardWithLogo },
   mounted() {
     this.getRandomImage();
+    this.loadTheme();
   },
   data() {
     return {
+      theme: 'light',
       imagesObjects: [
         {
           path: "images/access-blocked-websites.jpg",
@@ -161,13 +174,40 @@ export default {
           );
         }
       });
+    },
+    loadTheme() {
+      localStorage.get("theme")
+        .then(theme => {
+          this.theme = theme || 'light';
+          this.applyTheme();
+        })
+        .catch(() => {
+          this.theme = 'light';
+          this.applyTheme();
+        });
+    },
+    toggleTheme() {
+      this.theme = this.theme === 'light' ? 'dark' : 'light';
+      localStorage.set("theme", this.theme);
+      this.applyTheme();
+    },
+    applyTheme() {
+      document.documentElement.setAttribute('data-bs-theme', this.theme);
     }
   }
 };
 </script>
 
+<style>
+body, html {
+  background-color: transparent !important;
+  background: none !important;
+}
+</style>
+
 <style scoped>
 #go-back-image {
-  width: 95%;
+  max-width: 100%;
+  height: auto;
 }
 </style>
